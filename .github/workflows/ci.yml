@@ -7,12 +7,10 @@ env:
 
 on:
   pull_request:
-    branches: ['master', 'main']
-    paths-ignore: ['docs/**']
+    branches: ['main']
 
   push:
-    branches: ['master', 'main']
-    paths-ignore: ['docs/**']
+    branches: ['main']
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
