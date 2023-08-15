@@ -77,7 +77,6 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -93,9 +92,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-
 ]
-
 
 
 # PASSWORDS
@@ -175,7 +172,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-               ],
+            ],
         },
     }
 ]
