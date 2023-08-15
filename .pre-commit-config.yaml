@@ -17,17 +17,6 @@ repos:
       - id: check-docstring-first
       - id: detect-private-key
 
-  - repo: https://github.com/adamchainz/django-upgrade
-    rev: '1.14.0'
-    hooks:
-      - id: django-upgrade
-        args: ['--target-version', '4.2']
-
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.7.0
-    hooks:
-      - id: pyupgrade
-        args: [--py311-plus]
 
   - repo: https://github.com/psf/black
     rev: 23.3.0
@@ -44,14 +33,9 @@ repos:
     hooks:
       - id: flake8
 
-  - repo: https://github.com/Riverside-Healthcare/djLint
-    rev: v1.31.1
-    hooks:
-      - id: djlint-reformat-django
-      - id: djlint-django
 
 # sets up .pre-commit-ci.yaml to ensure pre-commit dependencies stay up to date
 ci:
-  autoupdate_schedule: weekly
+  autoupdate_schedule: monthly
   skip: []
   submodules: false
