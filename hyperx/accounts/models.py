@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin,Group
 from django.db import models
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import make_password
@@ -33,6 +33,11 @@ class UserManager(BaseUserManager):
         )
         user.set_password(password)  # Hash the password
         user.save(using=self._db)
+
+        # Assign user to appropriate group based on user_type
+        group_name = user_type.lower()  # Create group name from user_type
+        group, _ = Group.objects.get_or_create(name=group_name)
+        user.groups.add(group)
         return user
 
     def create_superuser(self, username, first_name, last_name, email, user_type, password=None):
@@ -52,13 +57,13 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     USER_TYPE_CHOICES = (
-        ('Manager', 'Manager'),
-        ('Hospital Supervisor', 'Hospital Supervisor'),
-        ('Registrar', 'Registrar'),
-        ('Nurse', 'Nurse'),
-        ('Lab Technician', 'Lab Technician'),
-        ('Pharmacist', 'Pharmacist'),
-        ('Physician', 'Physician'),
+        ('MANAGER', 'MANAGER'),
+        ('HOSPITAL_SUPERVISOR', 'HOSPITAL_SUPERVISOR'),
+        ('REGISTRAR', 'REGISTRAR'),
+        ('NURSE', 'NURSE'),
+        ('LAB_TECHNICIAN', 'LAB_TECHNICIAN'),
+        ('PHARMACIST', 'PHARMACIST'),
+        ('PHYSICIAN', 'PHYSICIAN'),
     )
 
     first_name = models.CharField(max_length=255)
@@ -85,3 +90,6 @@ class User(AbstractBaseUser, PermissionsMixin):
             'refresh': str(refresh),
             'access': str(refresh.access_token)
         }
+
+
+
