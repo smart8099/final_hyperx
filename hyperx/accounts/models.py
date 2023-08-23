@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import make_password
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, username, first_name, last_name, email, user_type, password=None):
+    def create_user(self, username, first_name, last_name, email,phone_number, user_type, password=None):
         """
         Create and save a regular user with the given details.
         """
@@ -21,6 +21,9 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError("User should have an email")
 
+        if not phone_number:
+            raise ValueError("User should have a phone number")
+
         if not user_type:
             raise ValueError("User should have a user type")
 
@@ -29,6 +32,7 @@ class UserManager(BaseUserManager):
             last_name=last_name,
             username=username,
             email=self.normalize_email(email),
+            phone_number=phone_number,
             user_type=user_type
         )
         user.set_password(password)  # Hash the password
@@ -70,6 +74,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=255)
     username = models.CharField(max_length=255,db_index=True,unique=True)
     email = models.CharField(max_length=255, unique=True, db_index=True)
+    phone_number = models.CharField(max_length=15,unique=True,default='')
     user_type = models.CharField(max_length=255, choices=USER_TYPE_CHOICES)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
