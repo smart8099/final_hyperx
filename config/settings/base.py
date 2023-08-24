@@ -78,7 +78,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     # Your stuff: custom apps go here
-    'hyperx.accounts'
+    "hyperx.accounts"
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -248,14 +248,11 @@ REST_FRAMEWORK = {
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
 CORS_URLS_REGEX = r"^/api/.*$"
 
-# By Default swagger ui is available only to admin user(s). You can change permission classes to change that
-# See more configuration options at https://drf-spectacular.readthedocs.io/en/latest/settings.html#settings
-SPECTACULAR_SETTINGS = {
-    "TITLE": "HyperX API",
-    "DESCRIPTION": "Documentation of API endpoints of HyperX",
-    "VERSION": "1.0.0",
-    # "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
+SWAGGER_SETTINGS = {
+    "DEFAULT_MODEL_RENDERING": "example",
+    "SECURITY_DEFINITIONS": {"Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}},
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
-AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = "accounts.User"
+DEFAULT_PASSWORD_FOR_NEWLY_REGISTERED_USERS = env("DEFAULT_PASSWORD_FOR_NEWLY_REGISTERED_USERS")
