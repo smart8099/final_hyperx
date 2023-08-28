@@ -4,6 +4,10 @@ from accounts.models import User
 from django.conf import settings
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib import auth
+from django.contrib.auth.models import Group
 class RegistrationSerializer(serializers.ModelSerializer):
     USER_TYPE_CHOICES = [
         'MANAGER', 'REGISTRAR', 'HOSPITAL_SUPERVISOR',
@@ -61,3 +65,68 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user.save()
 
         return user
+
+class LoginSerializer(serializers.ModelSerializer):
+    """
+    Serializer for user login.
+
+    Validates the provided username or email and password,
+    and authenticates the user.
+
+    Attributes:
+        username_or_email (str): The username or email for authentication.
+        password (str): The password for authentication.
+        username (str): The username of the authenticated user.
+        tokens (str): The authentication tokens.
+
+    Raises:
+        AuthenticationFailed: If the provided credentials are invalid or the user is not active
+
+    Returns:
+        dict: The serialized user data and tokens.
+
+    """
+
+    staff_id_or_email = serializers.CharField(max_length=255)
+    password = serializers.CharField(max_length=68, min_length=6, write_only=True)
+    username = serializers.CharField(max_length=255, read_only=True)
+    tokens = serializers.CharField(max_length=255, read_only=True)
+    DEFAULT_PASSWORD_FOR_NEWLY_REGISTERED_USERS = getattr(settings,"DEFAULT_PASSWORD_FOR_NEWLY_REGISTERED_USERS",'')
+    class Meta:
+        model = User
+        fields = ["staff_id_or_email", "password", "username", "tokens"]
+
+    def user_token(self, user):
+        refresh = RefreshToken.for_user(user)
+
+        return {"refresh": str(refresh), "access": str(refresh.access_token)}
+
+    def user_role(self, user):
+        group = user.groups.all().first()
+        role_name = group.name
+
+        return role_name
+
+    def validate(self, attrs):
+        staff_id_or_email = attrs.get("staff_id_or_email", "")
+        password = attrs.get("password", "")
+
+        user = auth.authenticate(username=staff_id_or_email, password=password)
+
+        change_default_password = False
+
+        if password == self.DEFAULT_PASSWORD_FOR_NEWLY_REGISTERED_USERS:
+            change_default_password = True
+
+        if not user:
+            raise AuthenticationFailed("Invalid credentials, try again")
+
+        if not user.is_active:
+            raise AuthenticationFailed("Account disabled, contact admin")
+
+        return {
+            "staff_id": user.username,
+            "user_role": self.user_role(user),
+            "change_default_password" : change_default_password,
+            "tokens": self.user_token(user),
+        }

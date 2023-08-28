@@ -4,6 +4,7 @@ Base settings to build other settings files upon.
 from pathlib import Path
 
 import environ
+import datetime
 
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 # hyperx/
@@ -93,6 +94,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
+    "hyperx.accounts.utilitites.custom_email_login_backend.EmailBackend",
 ]
 
 
@@ -256,3 +258,17 @@ SWAGGER_SETTINGS = {
 # ------------------------------------------------------------------------------
 AUTH_USER_MODEL = "accounts.User"
 DEFAULT_PASSWORD_FOR_NEWLY_REGISTERED_USERS = env("DEFAULT_PASSWORD_FOR_NEWLY_REGISTERED_USERS")
+
+refresh_token_lifetime = env.int("REFRESH_TOKEN_LIFETIME", default=1)
+access_token_lifetime = env.int("ACCESS_TOKEN_LIFETIME", default=1)
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(hours=access_token_lifetime),
+    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=refresh_token_lifetime),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": env("SECRET_KEY"),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
