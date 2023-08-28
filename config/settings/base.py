@@ -69,6 +69,7 @@ DJANGO_APPS = [
     # "django.contrib.humanize", # Handy template tags
     "django.contrib.admin",
     "django.forms",
+    "rest_framework_simplejwt.token_blacklist",
 ]
 THIRD_PARTY_APPS = [
     "rest_framework",

@@ -46,7 +46,7 @@ loginview_response_schema_dict = {
 
 
 refresh_token_response_schema_dict = {
-    "201": openapi.Response(
+    "200": openapi.Response(
         description="Successful Token Refresh",
         examples={
             "application/json": {
@@ -72,4 +72,29 @@ refresh_token_response_schema_dict = {
         description="Forbidden Access",
         examples={"application/json": {"errors": {"detail": "You do not have permission to perform this action."}}},
     ),
+}
+
+
+change_password_response_schema_dict = {
+    "200": openapi.Response(
+        description="Successful Token Refresh",
+        examples={
+            "application/json": {
+                "data": {
+                    "detail": "Password changed successfully."
+                }
+            }
+        },
+    ),
+    "401": openapi.Response(
+        description="Invalid Refresh Token/Unauthorized",
+        examples={
+            "application/json": {
+                "errors": {
+                    "detail": "Authentication credentials were not provided."
+
+                }
+            }
+        },
+    )
 }

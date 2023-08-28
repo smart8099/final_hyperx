@@ -130,3 +130,10 @@ class LoginSerializer(serializers.ModelSerializer):
             "change_default_password" : change_default_password,
             "tokens": self.user_token(user),
         }
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    old_password = serializers.CharField(max_length=68, min_length=6,write_only=True)
+    new_password = serializers.CharField(max_length=68, min_length=6,write_only=True)
+
+
