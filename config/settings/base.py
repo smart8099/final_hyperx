@@ -4,6 +4,7 @@ Base settings to build other settings files upon.
 from pathlib import Path
 
 import environ
+import datetime
 
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 # hyperx/
@@ -68,6 +69,7 @@ DJANGO_APPS = [
     # "django.contrib.humanize", # Handy template tags
     "django.contrib.admin",
     "django.forms",
+    "rest_framework_simplejwt.token_blacklist",
 ]
 THIRD_PARTY_APPS = [
     "rest_framework",
@@ -78,6 +80,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     # Your stuff: custom apps go here
+    "hyperx.accounts"
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -92,6 +95,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
+    "hyperx.accounts.utilitites.custom_email_login_backend.EmailBackend",
 ]
 
 
@@ -247,13 +251,28 @@ REST_FRAMEWORK = {
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
 CORS_URLS_REGEX = r"^/api/.*$"
 
-# By Default swagger ui is available only to admin user(s). You can change permission classes to change that
-# See more configuration options at https://drf-spectacular.readthedocs.io/en/latest/settings.html#settings
-SPECTACULAR_SETTINGS = {
-    "TITLE": "HyperX API",
-    "DESCRIPTION": "Documentation of API endpoints of HyperX",
-    "VERSION": "1.0.0",
-    # "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
+SWAGGER_SETTINGS = {
+    "DEFAULT_MODEL_RENDERING": "example",
+    "SECURITY_DEFINITIONS": {"Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}},
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+AUTH_USER_MODEL = "accounts.User"
+DEFAULT_PASSWORD_FOR_NEWLY_REGISTERED_USERS = env("DEFAULT_PASSWORD_FOR_NEWLY_REGISTERED_USERS")
+
+refresh_token_lifetime = env.int("REFRESH_TOKEN_LIFETIME", default=1)
+access_token_lifetime = env.int("ACCESS_TOKEN_LIFETIME", default=1)
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(hours=access_token_lifetime),
+    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=refresh_token_lifetime),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": env("SECRET_KEY"),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
